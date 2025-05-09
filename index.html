@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spin the Date Wheel!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>I thought it would be fun to spin for our next date... ❄️<br>
+    Tap the button below and let's see where fate takes us!</h2>
+    <div class="wheel-container">
+      <div class="arrow"></div>
+      <div id="wheel" class="wheel"></div>
+    </div>
+    <button onclick="spinWheel()">Spin!</button>
+    <p id="result" class="result"></p>
+  </div>
+
+  <script>
+    const wheel = document.getElementById('wheel');
+    const result = document.getElementById('result');
+    const segments = ['Mini Golf ⛳', 'Bowling 🎳', 'Ice Cream & Walk 🍦', 'Arcade 👾'];
+    const segmentCount = segments.length;
+    const degreesPerSegment = 360 / segmentCount;
+    let spinning = false;
+
+    function createWheel() {
+      const colors = ['#1abc9c', '#f1c40f', '#e74c3c', '#2980b9'];
+      const ctx = wheel.getContext('2d');
+      const radius = wheel.width / 2;
+      for (let i = 0; i < segmentCount; i++) {
+        const angle = (i * degreesPerSegment) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, angle, angle + degreesPerSegment * Math.PI / 180);
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle + degreesPerSegment * Math.PI / 360);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 18px sans-serif";
+        ctx.fillText(segments[i], radius - 10, 10);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+      result.textContent = '';
+
+      const extraSpins = 5;
+      const randomDeg = Math.floor(Math.random() * 360);
+      const finalDeg = extraSpins * 360 + randomDeg;
+
+      wheel.style.transition = 'transform 4s ease-out';
+      wheel.style.transform = `rotate(${finalDeg}deg)`;
+
+      setTimeout(() => {
+        const normalized = finalDeg % 360;
+        const index = Math.floor(((360 - normalized + degreesPerSegment / 2) % 360) / degreesPerSegment);
+        const picked = segments[index];
+
+        result.innerHTML = `You got: <strong>${picked}</strong> 💖<br>Let’s do it!`;
+        spinning = false;
+      }, 4000);
+    }
+
+    // Draw the wheel
+    window.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 300;
+      canvas.id = "wheel";
+      document.querySelector('.wheel-container').replaceChild(canvas, document.getElementById('wheel'));
+      createWheel();
+    };
+  </script>
+</body>
+</html>
